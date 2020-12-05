@@ -46,7 +46,7 @@ bool check_collision( SDL_Rect A, SDL_Rect B )
     return true;
 }
 
-bool check_terrain_col( SDL_Rect A, SDL_Rect** tabRect, char** tab, int tailleX, int tailleY){
+bool check_terrain_col( SDL_Rect A, SDL_Rect** tabRect, char** tab, int tailleX, int tailleY){//Non aboutie, une autre methode est utilisée pour gestion de collision
     bool res=false;
     for (int i = 0; i < tailleX; i++){
         for (int j = 0; j < tailleY; j++){
