@@ -37,8 +37,8 @@ int main(int argc, char *argv[]){
     int* tailleX = malloc(sizeof(int));
     int* tailleY = malloc(sizeof(int));
     taille_fichier("terrain.txt", tailleX, tailleY);
-    printf("%d\n", SIZE_X/ *tailleX);
-    printf("%d\n", SIZE_Y/ *tailleY);
+    //printf("%d\n", SIZE_X/ *tailleX);
+    //printf("%d\n", SIZE_Y/ *tailleY);
     char** terrain = lire_fichier("terrain.txt");
     SDL_Texture* pavage = charger_image( "pavage.bmp", ecran );
     int pw, pl;
@@ -136,28 +136,28 @@ int main(int argc, char *argv[]){
             switch(evenements.key.keysym.sym){
                 case SDLK_RIGHT:
                     
-                    if(DestR_sprite.x<(*tailleY-1)*SrcR_pavage[0][0].h+3){ //&& !(check_collision(DestR_sprite, DestR_pavage[i][j]) && terrain[i][j+1]!='0')){
+                    if(DestR_sprite.x<(*tailleY-1)*SrcR_pavage[0][0].h+3 && !(check_collision(DestR_sprite, DestR_pavage[i][j]) && terrain[i][j+1]!='0')){
                         DestR_sprite.x += 1;  
                         SDL_RenderCopy(ecran, sprite, &SrcR_sprite, &DestR_sprite);
-                        printf("%d\n", check_collision(DestR_pavage[0][0],DestR_sprite));
+                        //printf("%d\n", check_collision(DestR_pavage[0][0],DestR_sprite));
                     }
                     break;
                 case SDLK_LEFT:
-                    if (DestR_sprite.x>0 && j>0) //&& !(check_collision(DestR_sprite, DestR_pavage[i][j-1]) && terrain[i][j-1]!='0'))
+                    if (DestR_sprite.x>0 && !(check_collision(DestR_sprite, DestR_pavage[i][j-1]) && terrain[i][j-1]!='0'))
                     {
                         DestR_sprite.x -= 1;  
                         SDL_RenderCopy(ecran, sprite, &SrcR_sprite, &DestR_sprite); 
                     }
                     break;
                 case SDLK_DOWN:
-                    if (DestR_sprite.y<(*tailleX-2)*SrcR_pavage[0][0].w+3)// && !(check_collision(DestR_sprite, DestR_pavage[i][j]) && terrain[i+1][j]!='0'))
+                    if (DestR_sprite.y<(*tailleX-2)*SrcR_pavage[0][0].w+3 && !(check_collision(DestR_sprite, DestR_pavage[i][j]) && terrain[i+1][j]!='0'))
                     {
                         DestR_sprite.y += 1;  
                         SDL_RenderCopy(ecran, sprite, &SrcR_sprite, &DestR_sprite);
                     }
                     break;
                 case SDLK_UP:
-                    if (DestR_sprite.y>0)
+                    if (DestR_sprite.y>0 && !(check_collision(DestR_sprite, DestR_pavage[i][j+1]) && terrain[i][j+1]!='0'))
                     {
                         DestR_sprite.y -= 1;  
                         SDL_RenderCopy(ecran, sprite, &SrcR_sprite, &DestR_sprite);
