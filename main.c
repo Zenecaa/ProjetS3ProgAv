@@ -28,7 +28,7 @@ int main(int argc, char *argv[]){
     SDL_Renderer* ecran;
     ecran = SDL_CreateRenderer(fenetre, -1, SDL_RENDERER_ACCELERATED);
     // Charger l’image
-    SDL_Texture* fond = charger_image( "fond.bmp", ecran );
+    //SDL_Texture* fond = charger_image( "fond.bmp", ecran );
 
     // Charger l’image avec la transparence
     Uint8 r = 255, g = 255, b = 255;
@@ -86,8 +86,8 @@ int main(int argc, char *argv[]){
 
 
     SDL_Rect DestR_sprite;
-    DestR_sprite.x = 0;
-    DestR_sprite.y =  0;
+    DestR_sprite.x = 3;
+    DestR_sprite.y = 3;
     DestR_sprite.w = SIZE_X/ *tailleY;
     DestR_sprite.h = SIZE_Y/ *tailleY;
 
@@ -138,14 +138,22 @@ int main(int argc, char *argv[]){
                     
                     if(DestR_sprite.x<(*tailleY-1)*SrcR_pavage[0][0].h+3 && !(check_collision(DestR_sprite, DestR_pavage[i][j]) && terrain[i][j+1]!='0')){
                         DestR_sprite.x += 1;  
+                        if ((check_collision(DestR_sprite, DestR_pavage[i][j]) && terrain[i][j+1]!='0'))
+                        {
+                            DestR_sprite.x -= 1;
+                        }
                         SDL_RenderCopy(ecran, sprite, &SrcR_sprite, &DestR_sprite);
-                        //printf("%d\n", check_collision(DestR_pavage[0][0],DestR_sprite));
                     }
                     break;
                 case SDLK_LEFT:
-                    if (DestR_sprite.x>0 && !(check_collision(DestR_sprite, DestR_pavage[i][j-1]) && terrain[i][j-1]!='0'))
+                    if (DestR_sprite.x>0 && !(check_collision(DestR_sprite, DestR_pavage[i][j]) && terrain[i][j]!='0'))
                     {
                         DestR_sprite.x -= 1;  
+                        if ((check_collision(DestR_sprite, DestR_pavage[i][j]) && terrain[i][j]!='0'))
+                        {
+                            DestR_sprite.x += 1;
+                        }
+                        
                         SDL_RenderCopy(ecran, sprite, &SrcR_sprite, &DestR_sprite); 
                     }
                     break;
@@ -157,9 +165,14 @@ int main(int argc, char *argv[]){
                     }
                     break;
                 case SDLK_UP:
-                    if (DestR_sprite.y>0 && !(check_collision(DestR_sprite, DestR_pavage[i][j+1]) && terrain[i][j+1]!='0'))
+                    if (DestR_sprite.y>0 && !(check_collision(DestR_sprite, DestR_pavage[i][j]) && terrain[i][j]!='0'))
                     {
                         DestR_sprite.y -= 1;  
+                        if ((check_collision(DestR_sprite, DestR_pavage[i][j]) && terrain[i][j]!='0'))
+                        {
+                            DestR_sprite.y += 1;
+                        }
+                        
                         SDL_RenderCopy(ecran, sprite, &SrcR_sprite, &DestR_sprite);
                     }
                     break;
@@ -170,7 +183,7 @@ int main(int argc, char *argv[]){
         SDL_RenderPresent(ecran);
     }// Quitter SDL;
     TTF_Quit();
-    SDL_DestroyTexture(fond);
+    //SDL_DestroyTexture(fond);
     SDL_DestroyTexture(sprite);
     SDL_DestroyTexture(pavage);
     SDL_DestroyRenderer(ecran);//Quitter SDL ...

@@ -26,20 +26,20 @@ bool check_collision( SDL_Rect A, SDL_Rect B )
     topB = B.y;
     bottomB = B.y + B.h;
 
-     //Tests de collision
-    if( bottomA <= topB ){
+    //Tests de collision
+    /*if( bottomA <= topB ){
         return false;
     }
- 
     if( topA >= bottomB ){
         return false;
     }
- 
     if( rightA <= leftB ){
         return false;
     }
- 
     if( leftA >= rightB ){
+        return false;
+    }*/
+    if(bottomA <= topB || topA >= bottomB || rightA <= leftB || leftA >= rightB){
         return false;
     }
     //Si conditions collision detectee
