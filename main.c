@@ -6,8 +6,12 @@
 #include "fonctions_SDL.h"
 #include "fonction_fichiers.h"
 #include "fonctions_collision.h"
+#include "fonction_objet.h"
+#include "fonction_personnage.h"
 #define SIZE_X 600
 #define SIZE_Y 600
+#define START_HEALTH 20
+#define START_STRENGTH 1
 
 int main(int argc, char *argv[]){
     SDL_Window* fenetre;  // Déclaration de la fenêtre
@@ -66,7 +70,7 @@ int main(int argc, char *argv[]){
         }
     }
 
-    SDL_SetWindowSize(fenetre, (*tailleY)*SrcR_pavage[0][0].h, (*tailleX-1)*SrcR_pavage[0][0].w);
+    SDL_SetWindowSize(fenetre, (*tailleY)*SrcR_pavage[0][0].h, (*tailleX)*SrcR_pavage[0][0].w);
 
     SDL_Surface *surf = SDL_LoadBMP("sprites.bmp");
     Uint32 *mespixels = (Uint32*) ((Uint8*) surf->pixels);
@@ -91,6 +95,35 @@ int main(int argc, char *argv[]){
     DestR_sprite.w = SIZE_X/ *tailleY;
     DestR_sprite.h = SIZE_Y/ *tailleY;
 
+    Personnage p =cons(DestR_sprite, START_HEALTH, START_STRENGTH);
+    
+    int n = 0;
+    for (int i = 0; i < *tailleX; i++)
+        {
+            for (int j = 0; j < *tailleY; j++)
+            {
+                if (terrain[i][j]=='5')
+                {
+                    n++;
+                }
+                
+            }
+        }
+    Objet o[n];
+    n=0;
+    for (int i = 0; i < *tailleX; i++)
+        {
+            for (int j = 0; j < *tailleY; j++)
+            {
+                if (terrain[i][j]=='5')
+                {
+                    Objet tmp = construct(DestR_pavage[i][j], true, 20, 0);
+                    o[n] = tmp;
+                    n++;
+                }
+                
+            }
+        }
     //printf("%d\n", check_collision(SrcR_pavage[0][0],SrcR_pavage[2][2]));
     //printf("%d\n", check_collision(DestR_pavage[0][0],DestR_sprite));
     //check_terrain_col(DestR_sprite, DestR_pavage, terrain, *tailleX, *tailleY);
@@ -120,15 +153,25 @@ int main(int argc, char *argv[]){
                 case '4':
                     SDL_RenderCopy(ecran, pavage, &SrcR_pavage[4][0], &DestR_pavage[i][j]);
                     break;
+                case '5':
+                    SDL_RenderCopy(ecran, pavage, &SrcR_pavage[0][0], &DestR_pavage[i][j]);
+                    break;
                 default:
                     break;
                 }
             }
             
         }
-        SDL_RenderCopy(ecran, sprite, &SrcR_sprite, &DestR_sprite);
-        int i=DestR_sprite.y/DestR_pavage[0][0].h;
-        int j=DestR_sprite.x/DestR_pavage[0][0].w;
+        SDL_RenderCopy(ecran, sprite, &SrcR_sprite, &p.DestR);
+        int i=p.DestR.y/DestR_pavage[0][0].h;
+        int j=p.DestR.x/DestR_pavage[0][0].w;
+        for (int i = 0; i < n; i++)
+            {
+                if (!o[i].recupere)
+                {
+                    SDL_RenderCopy(ecran, sprite, &SrcR_sprite, &o[i].DestR);
+                }
+            }
         switch(evenements.type){
             case SDL_QUIT:terminer = true;
             break;
@@ -136,44 +179,58 @@ int main(int argc, char *argv[]){
             switch(evenements.key.keysym.sym){
                 case SDLK_RIGHT:
                     
-                    if(DestR_sprite.x<(*tailleY-1)*SrcR_pavage[0][0].h+3 && !(check_collision(DestR_sprite, DestR_pavage[i][j]) && terrain[i][j+1]!='0')){
-                        DestR_sprite.x += 1;  
-                        if ((check_collision(DestR_sprite, DestR_pavage[i][j]) && terrain[i][j+1]!='0'))
+                    if(p.DestR.x<(*tailleY-1)*SrcR_pavage[0][0].h+3 && !(check_collision(p.DestR, DestR_pavage[i][j]) && !(terrain[i][j+1]=='0' || terrain[i][j+1]=='5'))){
+                        p.DestR.x += 1;
+                        SDL_RenderCopy(ecran, sprite, &SrcR_sprite, &p.DestR);
+                        for (int i = 0; i < n; i++)
                         {
-                            DestR_sprite.x -= 1;
+                            if ((check_collision(o[i].DestR, p.DestR) && !o[i].recupere))
+                            {
+                                o[i].recupere = recuperer(o[i], &p);
+                            }
                         }
-                        SDL_RenderCopy(ecran, sprite, &SrcR_sprite, &DestR_sprite);
                     }
                     break;
                 case SDLK_LEFT:
-                    if (DestR_sprite.x>0 && !(check_collision(DestR_sprite, DestR_pavage[i][j]) && terrain[i][j]!='0'))
+                    if (p.DestR.x>0 && !(check_collision(p.DestR, DestR_pavage[i][j]) && !(terrain[i][j]=='0' || terrain[i][j]=='5')))
                     {
-                        DestR_sprite.x -= 1;  
-                        if ((check_collision(DestR_sprite, DestR_pavage[i][j]) && terrain[i][j]!='0'))
+                        p.DestR.x -= 1;  
+                        SDL_RenderCopy(ecran, sprite, &SrcR_sprite, &p.DestR); 
+                        for (int i = 0; i < n; i++)
                         {
-                            DestR_sprite.x += 1;
+                            if ((check_collision(o[i].DestR, p.DestR) && !o[i].recupere))
+                            {
+                                o[i].recupere = recuperer(o[i], &p);
+                            }
                         }
-                        
-                        SDL_RenderCopy(ecran, sprite, &SrcR_sprite, &DestR_sprite); 
                     }
                     break;
                 case SDLK_DOWN:
-                    if (DestR_sprite.y<(*tailleX-2)*SrcR_pavage[0][0].w+3 && !(check_collision(DestR_sprite, DestR_pavage[i][j]) && terrain[i+1][j]!='0'))
+                    if (p.DestR.y<(*tailleX-2)*SrcR_pavage[0][0].w+3 && (i<(*tailleX-1) && !(check_collision(p.DestR, DestR_pavage[i+1][j]) && !(terrain[i+1][j]=='0' || terrain[i+1][j]=='5')) && i<(*tailleX-1)) )//|| (i<tailleX-1 && terrain[i+1][j]=='0'))
                     {
-                        DestR_sprite.y += 1;  
-                        SDL_RenderCopy(ecran, sprite, &SrcR_sprite, &DestR_sprite);
+                        p.DestR.y += 1;  
+                        SDL_RenderCopy(ecran, sprite, &SrcR_sprite, &p.DestR);
+                        for (int i = 0; i < n; i++)
+                        {
+                            if ((check_collision(o[i].DestR, p.DestR) && !o[i].recupere))
+                            {
+                                o[i].recupere = recuperer(o[i], &p);
+                            }
+                        }
                     }
                     break;
                 case SDLK_UP:
-                    if (DestR_sprite.y>0 && !(check_collision(DestR_sprite, DestR_pavage[i][j]) && terrain[i][j]!='0'))
+                    if (p.DestR.y>0 && !(check_collision(p.DestR, DestR_pavage[i][j]) && !(terrain[i][j]=='0' || terrain[i][j]=='5')))
                     {
-                        DestR_sprite.y -= 1;  
-                        if ((check_collision(DestR_sprite, DestR_pavage[i][j]) && terrain[i][j]!='0'))
+                        p.DestR.y -= 1;
+                        SDL_RenderCopy(ecran, sprite, &SrcR_sprite, &p.DestR);
+                        for (int i = 0; i < n; i++)
                         {
-                            DestR_sprite.y += 1;
+                            if ((check_collision(o[i].DestR, p.DestR) && !o[i].recupere))
+                            {
+                                o[i].recupere = recuperer(o[i], &p);
+                            }
                         }
-                        
-                        SDL_RenderCopy(ecran, sprite, &SrcR_sprite, &DestR_sprite);
                     }
                     break;
                 case SDLK_ESCAPE:terminer = true;  
