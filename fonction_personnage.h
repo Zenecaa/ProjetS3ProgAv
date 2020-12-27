@@ -12,6 +12,6 @@ typedef struct Personnage {
 
   bool estMort(Personnage p);
 
-  void attaquer(Personnage agresseur, Personnage cible);
+  void attaquer(Personnage agresseur, Personnage *cible);
 
 #endif

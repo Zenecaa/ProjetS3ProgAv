@@ -10,7 +10,7 @@
 #include "fonction_personnage.h"
 #define SIZE_X 600
 #define SIZE_Y 600
-#define START_HEALTH 20
+#define START_HEALTH 3
 #define START_STRENGTH 1
 
 int main(int argc, char *argv[]){
@@ -41,8 +41,6 @@ int main(int argc, char *argv[]){
     int* tailleX = malloc(sizeof(int));
     int* tailleY = malloc(sizeof(int));
     taille_fichier("terrain.txt", tailleX, tailleY);
-    //printf("%d\n", SIZE_X/ *tailleX);
-    //printf("%d\n", SIZE_Y/ *tailleY);
     char** terrain = lire_fichier("terrain.txt");
     SDL_Texture* pavage = charger_image( "pavage.bmp", ecran );
     int pw, pl;
@@ -97,20 +95,26 @@ int main(int argc, char *argv[]){
 
     Personnage p =cons(DestR_sprite, START_HEALTH, START_STRENGTH);
     
-    int n = 0;
+    int nbObjet = 0;
+    int nbEnnemi = 0;
     for (int i = 0; i < *tailleX; i++)
         {
             for (int j = 0; j < *tailleY; j++)
             {
                 if (terrain[i][j]=='5')
                 {
-                    n++;
+                    nbObjet++;
                 }
-                
+                if (terrain[i][j]=='6')
+                {
+                    nbEnnemi++;
+                }
             }
         }
-    Objet o[n];
-    n=0;
+    Objet o[nbObjet];
+    Personnage e[nbEnnemi];
+    nbObjet=0;
+    nbEnnemi=0;
     for (int i = 0; i < *tailleX; i++)
         {
             for (int j = 0; j < *tailleY; j++)
@@ -118,20 +122,26 @@ int main(int argc, char *argv[]){
                 if (terrain[i][j]=='5')
                 {
                     Objet tmp = construct(DestR_pavage[i][j], true, 20, 0);
-                    o[n] = tmp;
-                    n++;
+                    o[nbObjet] = tmp;
+                    nbObjet++;
                 }
-                
+                if (terrain[i][j]=='6')
+                {
+                    Personnage tmp = cons(DestR_pavage[i][j], 5, 1);
+                    e[nbEnnemi] = tmp;
+                    nbEnnemi++;
+                }
             }
         }
-    //printf("%d\n", check_collision(SrcR_pavage[0][0],SrcR_pavage[2][2]));
-    //printf("%d\n", check_collision(DestR_pavage[0][0],DestR_sprite));
-    //check_terrain_col(DestR_sprite, DestR_pavage, terrain, *tailleX, *tailleY);
+
+    
 
     // Boucle principale
     while(!terminer){
         SDL_PollEvent( &evenements );
         SDL_RenderClear(ecran);
+        if (!estMort(p))
+        {
         for (int i = 0; i < *tailleX; i++)
         {
             for (int j = 0; j < *tailleY; j++)
@@ -156,22 +166,43 @@ int main(int argc, char *argv[]){
                 case '5':
                     SDL_RenderCopy(ecran, pavage, &SrcR_pavage[0][0], &DestR_pavage[i][j]);
                     break;
+                case '6':
+                    SDL_RenderCopy(ecran, pavage, &SrcR_pavage[0][0], &DestR_pavage[i][j]);
+                    break;
                 default:
                     break;
                 }
             }
             
         }
-        SDL_RenderCopy(ecran, sprite, &SrcR_sprite, &p.DestR);
+        //if (!estMort(p))
+        //{
+            SDL_RenderCopy(ecran, sprite, &SrcR_sprite, &p.DestR);
+        //}
         int i=p.DestR.y/DestR_pavage[0][0].h;
         int j=p.DestR.x/DestR_pavage[0][0].w;
-        for (int i = 0; i < n; i++)
+        for (int i = 0; i < nbObjet; i++)
             {
                 if (!o[i].recupere)
                 {
-                    SDL_RenderCopy(ecran, sprite, &SrcR_sprite, &o[i].DestR);
+                    //SDL_RenderCopy(ecran, sprite, &SrcR_sprite, &o[i].DestR);
                 }
             }
+        for (int i = 0; i < nbEnnemi; i++)
+            {
+                if (!estMort(e[i]))
+                {
+                    SDL_RenderCopy(ecran, sprite, &SrcR_sprite, &e[i].DestR);
+                }
+            }
+        /*for (int i = 0; i < nbEnnemi; i++)
+            {
+                if (check_collision(p.DestR, e[i].DestR))
+                {
+                    sleep(1000);
+                    attaquer(e[i],&p);
+                }
+            }*/
         switch(evenements.type){
             case SDL_QUIT:terminer = true;
             break;
@@ -179,10 +210,10 @@ int main(int argc, char *argv[]){
             switch(evenements.key.keysym.sym){
                 case SDLK_RIGHT:
                     
-                    if(p.DestR.x<(*tailleY-1)*SrcR_pavage[0][0].h+3 && !(check_collision(p.DestR, DestR_pavage[i][j]) && !(terrain[i][j+1]=='0' || terrain[i][j+1]=='5'))){
+                    if(p.DestR.x<(*tailleY-1)*SrcR_pavage[0][0].h+3 && !estMort(p) && !(check_collision(p.DestR, DestR_pavage[i][j]) && !(terrain[i][j+1]=='0' || terrain[i][j+1]=='5' || terrain[i][j+1]=='6'))){
                         p.DestR.x += 1;
                         SDL_RenderCopy(ecran, sprite, &SrcR_sprite, &p.DestR);
-                        for (int i = 0; i < n; i++)
+                        for (int i = 0; i < nbObjet; i++)
                         {
                             if ((check_collision(o[i].DestR, p.DestR) && !o[i].recupere))
                             {
@@ -192,11 +223,11 @@ int main(int argc, char *argv[]){
                     }
                     break;
                 case SDLK_LEFT:
-                    if (p.DestR.x>0 && !(check_collision(p.DestR, DestR_pavage[i][j]) && !(terrain[i][j]=='0' || terrain[i][j]=='5')))
+                    if (p.DestR.x>0 && !estMort(p) && !(check_collision(p.DestR, DestR_pavage[i][j]) && !(terrain[i][j]=='0' || terrain[i][j]=='5' || terrain[i][j]=='6')))
                     {
                         p.DestR.x -= 1;  
                         SDL_RenderCopy(ecran, sprite, &SrcR_sprite, &p.DestR); 
-                        for (int i = 0; i < n; i++)
+                        for (int i = 0; i < nbObjet; i++)
                         {
                             if ((check_collision(o[i].DestR, p.DestR) && !o[i].recupere))
                             {
@@ -206,11 +237,11 @@ int main(int argc, char *argv[]){
                     }
                     break;
                 case SDLK_DOWN:
-                    if (p.DestR.y<(*tailleX-2)*SrcR_pavage[0][0].w+3 && (i<(*tailleX-1) && !(check_collision(p.DestR, DestR_pavage[i+1][j]) && !(terrain[i+1][j]=='0' || terrain[i+1][j]=='5')) && i<(*tailleX-1)) )//|| (i<tailleX-1 && terrain[i+1][j]=='0'))
+                    if (p.DestR.y<(*tailleX-2)*SrcR_pavage[0][0].w+3 && !estMort(p) && (i<(*tailleX-1) && !(check_collision(p.DestR, DestR_pavage[i+1][j]) && !(terrain[i+1][j]=='0' || terrain[i+1][j]=='5' || terrain[i+1][j]=='6')) && i<(*tailleX-1)) )//|| (i<tailleX-1 && terrain[i+1][j]=='0'))
                     {
                         p.DestR.y += 1;  
                         SDL_RenderCopy(ecran, sprite, &SrcR_sprite, &p.DestR);
-                        for (int i = 0; i < n; i++)
+                        for (int i = 0; i < nbObjet; i++)
                         {
                             if ((check_collision(o[i].DestR, p.DestR) && !o[i].recupere))
                             {
@@ -220,11 +251,11 @@ int main(int argc, char *argv[]){
                     }
                     break;
                 case SDLK_UP:
-                    if (p.DestR.y>0 && !(check_collision(p.DestR, DestR_pavage[i][j]) && !(terrain[i][j]=='0' || terrain[i][j]=='5')))
+                    if (p.DestR.y>0 && !estMort(p) && !(check_collision(p.DestR, DestR_pavage[i][j]) && !(terrain[i][j]=='0' || terrain[i][j]=='5' || terrain[i][j]=='6')))
                     {
                         p.DestR.y -= 1;
                         SDL_RenderCopy(ecran, sprite, &SrcR_sprite, &p.DestR);
-                        for (int i = 0; i < n; i++)
+                        for (int i = 0; i < nbObjet; i++)
                         {
                             if ((check_collision(o[i].DestR, p.DestR) && !o[i].recupere))
                             {
@@ -233,14 +264,28 @@ int main(int argc, char *argv[]){
                         }
                     }
                     break;
+                case SDLK_SPACE:
+                    for (int i = 0; i < nbEnnemi; i++)
+                    {
+                        if (check_collision(p.DestR, e[i].DestR))
+                        {
+                            attaquer(p,&e[i]);
+                            attaquer(e[i],&p);
+                        }
+                    }
+                    break;
                 case SDLK_ESCAPE:terminer = true;  
                 break;
             }
         }
+        }
+        else
+        {
+            terminer = true;
+        }
         SDL_RenderPresent(ecran);
     }// Quitter SDL;
     TTF_Quit();
-    //SDL_DestroyTexture(fond);
     SDL_DestroyTexture(sprite);
     SDL_DestroyTexture(pavage);
     SDL_DestroyRenderer(ecran);//Quitter SDL ...

@@ -20,9 +20,9 @@
      return res;
  }
 
- void attaquer(Personnage agresseur, Personnage cible){
-     if (!estMort(agresseur)&&!estMort(cible))
+ void attaquer(Personnage agresseur, Personnage *cible){
+     if (!estMort(agresseur)&&!estMort(*cible))
      {
-         cible.vie= cible.vie - agresseur.force;
+         cible->vie= cible->vie - agresseur.force;
      }
  }
