@@ -16,6 +16,7 @@
 int main(int argc, char *argv[]){
     SDL_Window* fenetre;  // Déclaration de la fenêtre
     SDL_Event evenements; // Événements liés à la fenêtre
+    bool continuer = false;
     bool terminer = false;
     if(SDL_Init(SDL_INIT_VIDEO) < 0) // Initialisation de la SDL
     {
@@ -56,6 +57,8 @@ int main(int argc, char *argv[]){
         }
     }
 
+   
+
     
     SDL_Rect DestR_pavage[*tailleX][*tailleY];
     for (int i = 0; i < *tailleX; i++){
@@ -67,8 +70,10 @@ int main(int argc, char *argv[]){
             DestR_pavage[i][j].h = pw/16;
         }
     }
-
-    SDL_SetWindowSize(fenetre, (*tailleY)*SrcR_pavage[0][0].h, (*tailleX)*SrcR_pavage[0][0].w);
+    
+    int height = (*tailleX)*SrcR_pavage[0][0].w;
+    int width = (*tailleY)*SrcR_pavage[0][0].h;
+    SDL_SetWindowSize(fenetre, width, height);
 
     SDL_Surface *surf = SDL_LoadBMP("sprites.bmp");
     Uint32 *mespixels = (Uint32*) ((Uint8*) surf->pixels);
@@ -92,6 +97,37 @@ int main(int argc, char *argv[]){
     DestR_sprite.y = 3;
     DestR_sprite.w = SIZE_X/ *tailleY;
     DestR_sprite.h = SIZE_Y/ *tailleY;
+
+    //Menu de départ
+    TTF_Init();
+    TTF_Font *font = TTF_OpenFont("./arial.ttf",28);
+    SDL_Color color = {0,0,0,0};
+    char msg[] = "Jouer";
+    SDL_Texture* jouer = charger_texte(msg,ecran,font,color);
+    SDL_Rect text_pos; // Position du texte
+    text_pos.x = width/3;
+    text_pos.y = height/7;
+    SDL_Rect dst = {0, 0, 0, 0};
+    SDL_QueryTexture(jouer, NULL, NULL, &dst.w, &dst.h);
+    text_pos.w = width/3;
+    text_pos.h = height/7;
+
+    char msg2[] = "Charger";
+    SDL_Texture* charger = charger_texte(msg2,ecran,font,color);
+    SDL_Rect text1;
+    text1.x = width/3;
+    text1.y = 3*(height/7);
+    text1.w = width/3;
+    text1.h = height/7;
+
+    char msg3[] = "Quitter";
+    SDL_Texture* quitter = charger_texte(msg3,ecran,font,color);
+    SDL_Rect text2;
+    text2.x = width/3;
+    text2.y = 5*(height/7);
+    text2.w = width/3;
+    text2.h = height/7;
+
 
     Personnage p =cons(DestR_sprite, START_HEALTH, START_STRENGTH);
     
@@ -134,8 +170,38 @@ int main(int argc, char *argv[]){
             }
         }
 
-    
-
+    SDL_Texture * fond = charger_image("fond.bmp", ecran);
+    while (!continuer)
+    {
+        //SDL_PollEvent( &evenements );
+        SDL_RenderClear(ecran);
+        SDL_RenderCopy(ecran, fond, NULL, NULL);
+        SDL_WaitEvent(&evenements);
+        SDL_RenderCopy(ecran,jouer,NULL,&text_pos);
+        SDL_RenderCopy(ecran,charger,NULL,&text1);
+        SDL_RenderCopy(ecran,quitter,NULL,&text2);
+        switch(evenements.type){
+            case SDL_QUIT:continuer = true;
+            break;
+            case SDL_KEYDOWN:
+                switch(evenements.key.keysym.sym){
+                    case SDLK_SPACE:continuer = true;
+                    break;
+                }
+            case SDL_MOUSEBUTTONUP: 
+                if (evenements.button.y<(text_pos.y+text_pos.h) && evenements.button.y>(text_pos.y))
+                {
+                    continuer = true;
+                }
+                if (evenements.button.y<(text2.y+text2.h) && evenements.button.y>(text2.y))
+                {
+                    continuer = true;
+                    terminer = true;
+                }
+           break;
+        }
+        SDL_RenderPresent(ecran);
+    }
     // Boucle principale
     while(!terminer){
         SDL_PollEvent( &evenements );
@@ -195,14 +261,6 @@ int main(int argc, char *argv[]){
                     SDL_RenderCopy(ecran, sprite, &SrcR_sprite, &e[i].DestR);
                 }
             }
-        /*for (int i = 0; i < nbEnnemi; i++)
-            {
-                if (check_collision(p.DestR, e[i].DestR))
-                {
-                    sleep(1000);
-                    attaquer(e[i],&p);
-                }
-            }*/
         switch(evenements.type){
             case SDL_QUIT:terminer = true;
             break;
@@ -286,6 +344,7 @@ int main(int argc, char *argv[]){
         SDL_RenderPresent(ecran);
     }// Quitter SDL;
     TTF_Quit();
+    SDL_DestroyTexture(fond);
     SDL_DestroyTexture(sprite);
     SDL_DestroyTexture(pavage);
     SDL_DestroyRenderer(ecran);//Quitter SDL ...
