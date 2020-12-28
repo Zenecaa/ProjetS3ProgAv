@@ -345,6 +345,9 @@ int main(int argc, char *argv[]){
     }// Quitter SDL;
     TTF_Quit();
     SDL_DestroyTexture(fond);
+    SDL_DestroyTexture(jouer);
+    SDL_DestroyTexture(charger);
+    SDL_DestroyTexture(quitter);
     SDL_DestroyTexture(sprite);
     SDL_DestroyTexture(pavage);
     SDL_DestroyRenderer(ecran);//Quitter SDL ...
