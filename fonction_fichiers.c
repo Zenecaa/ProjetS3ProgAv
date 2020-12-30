@@ -137,7 +137,17 @@ char** lire_fichier(const char* nomFichier){
 }
 
 char** modifier_caractere(char** tab, int n, int m, char ancien, char nouveau){
-    
+    for (int i = 0; i < n; i++)
+    {
+        for (int j = 0; j < m; j++)
+        {
+            if (tab[i][j]==ancien)
+            {
+                tab[i][j]=nouveau;
+            }
+            
+        }
+    }  
 }
 
 

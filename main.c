@@ -10,7 +10,7 @@
 #include "fonction_personnage.h"
 #define SIZE_X 600
 #define SIZE_Y 600
-#define START_HEALTH 3
+#define START_HEALTH 20
 #define START_STRENGTH 1
 
 int main(int argc, char *argv[]){
@@ -161,6 +161,14 @@ int main(int argc, char *argv[]){
 
 
     //Menu Fin 
+    char msgFin[] = "Felicitation";
+    SDL_Texture* t_fin = charger_texte(msgFin,ecran,font,color);
+    SDL_Rect t_fin_pos;
+    t_fin_pos.x = width/4;
+    t_fin_pos.y = 2*(height/7);
+    t_fin_pos.w = width/2;
+    t_fin_pos.h = height/5;
+
 
     //Menu Mort
     char msgMort[] = "Vous etes mort";
@@ -232,6 +240,22 @@ int main(int argc, char *argv[]){
         }
 
     SDL_Texture * fond = charger_image("fond.bmp", ecran);
+
+    SDL_Rect sortie;
+
+    for (int i = 0; i < *tailleX; i++)
+    {
+        for (int j = 0; j < *tailleY; j++)
+        {
+            if (terrain[i][j]=='2')
+            {
+                sortie = DestR_pavage[i][j]; 
+            } 
+        }
+        
+    }
+    
+
     while (!continuer)
     {
         //SDL_PollEvent( &evenements );
@@ -305,6 +329,47 @@ int main(int argc, char *argv[]){
                     break;
                 }
             }
+        }
+        int victimes = 0;
+        for (int i = 0; i < nbEnnemi; i++)
+        {
+            if (estMort(e[i]))
+            {
+                victimes++;
+            }
+        }
+        if (victimes==(nbEnnemi-1))
+        {
+            modifier_caractere(terrain, *tailleX, *tailleY, '2', '0');
+        }
+        if (check_collision(p.DestR, sortie))
+        {
+            while (!terminer)
+            {
+                SDL_RenderClear(ecran);
+                SDL_RenderCopy(ecran, fond, NULL, NULL);
+                SDL_WaitEvent(&evenements);
+                SDL_RenderCopy(ecran,t_fin,NULL,&t_fin_pos);
+                SDL_RenderCopy(ecran,t_GO_charg,NULL,&t_GO_charg_pos);
+                SDL_RenderCopy(ecran,t_GO_quit,NULL,&t_GO_quit_pos);
+                switch(evenements.type){
+                    case SDL_QUIT:terminer = true;
+                    break;
+                    case SDL_KEYDOWN:
+                        switch(evenements.key.keysym.sym){
+                            case SDLK_ESCAPE:terminer = true;
+                            break;
+                        }
+                    case SDL_MOUSEBUTTONUP: 
+                        if (evenements.button.y<(t_GO_quit_pos.y+t_GO_quit_pos.h) && evenements.button.y>(t_GO_quit_pos.y))
+                        {
+                            
+                            terminer = true;
+                        }
+                    break;
+                }
+                SDL_RenderPresent(ecran);
+            }
             
         }
         SDL_RenderCopy(ecran, sprite, &SrcR_sprite, &p.DestR);
@@ -317,68 +382,37 @@ int main(int argc, char *argv[]){
                     SDL_RenderCopy(ecran, sprite, &SrcR_sprite, &o[i].DestR);
                 }
             }
-        for (int i = 0; i < nbEnnemi; i++)
+        for (int i = 1; i < nbEnnemi; i++)
             {
                 if (!estMort(e[i]))
                 {
                     int posx=e[i].DestR.y/DestR_pavage[0][0].h;
                     int posy=e[i].DestR.x/DestR_pavage[0][0].w;
-                    /*switch (sens[i])
+                    if (sens[i])
                     {
-                    case true:
-                            if (e[i].DestR.x<(*tailleY-1)*SrcR_pavage[0][0].h+3 && !estMort(e[i]) && !(check_collision(e[i].DestR, DestR_pavage[posx][posy]) && !(terrain[posx][posy+1]=='0' || terrain[posx][posy+1]=='5' || terrain[posx][posy+1]=='6')))
-                            {
-                                if (sens[i])
-                                {
-                                    e[i].DestR.x +=1;
-                                }
-                                else
-                                    sens[i] = !sens[i]; 
-                            }
-                            SDL_RenderCopy(ecran, sprite, &SrcR_sprite, &e[i].DestR);
-                            break;
-                        case false:
-                            if (e[i].DestR.x>0 && !estMort(e[i]) && !(check_collision(e[i].DestR, DestR_pavage[pPosx][pPosy]) && !(terrain[pPosx][pPosy]=='0' || terrain[pPosx][pPosy]=='5' || terrain[pPosx][pPosy]=='6')))
-                            {
-                                if (!sens[i])
-                                {
-                                    e[i].DestR.x -=1;
-                                }
-                                else
-                                    sens[i] = !sens[i];
-                            }
-                            else
-                            {
-                                sens[i] = true;
-                            }
-                            SDL_RenderCopy(ecran, sprite, &SrcR_sprite, &e[i].DestR);
-                            break;
-                    default:
-                        break;
-                    }*/
-                    //printf("%d", sens[i]);
-                    if (e[i].DestR.x<(*tailleY-1)*SrcR_pavage[0][0].h+3 && !estMort(e[i]) && !(check_collision(e[i].DestR, DestR_pavage[posx][posy]) && !(terrain[posx][posy+1]=='0' || terrain[posx][posy+1]=='5' || terrain[posx][posy+1]=='6')))
+                        if (e[i].DestR.x<(*tailleY-1)*SrcR_pavage[0][0].h+3 && !estMort(e[i]) && !(check_collision(e[i].DestR, DestR_pavage[posx][posy]) && !(terrain[posx][posy+1]=='0' || terrain[posx][posy+1]=='5' || terrain[posx][posy+1]=='6')))
                         {
-                            if (sens[i])
-                            {
-                                e[i].DestR.x +=1;
-                            }
-                            else
-                                
-                                sens[i] = !sens[i]; 
-                        }
-                    else if (e[i].DestR.x>0 && !estMort(e[i]) && !(check_collision(e[i].DestR, DestR_pavage[pPosx][pPosy]) && !(terrain[pPosx][pPosy]=='0' || terrain[pPosx][pPosy]=='5' || terrain[pPosx][pPosy]=='6')))
-                        {
-                            if (!sens[i])
-                            {
-                                e[i].DestR.x -=1;
-                            }
-                            else
-                                sens[i] = !sens[i];
-                        }
-                        else
-                            sens[i] = true;
+                            e[i].DestR.x +=1;
                             SDL_RenderCopy(ecran, sprite, &SrcR_sprite, &e[i].DestR);
+                        }
+                        else {
+                            sens[i] = !sens[i];
+                        }
+                        
+                    }
+                    if (!sens[i])
+                    {
+                        if (e[i].DestR.x>0 && !estMort(e[i]) && !(check_collision(e[i].DestR, DestR_pavage[posx][posy]) && !(terrain[posx][posy]=='0' || terrain[posx][posy]=='5' || terrain[posx][posy]=='6')))
+                        {
+                            e[i].DestR.x -=1;
+                            SDL_RenderCopy(ecran, sprite, &SrcR_sprite, &e[i].DestR);
+                        }
+                        else {
+                            sens[i] = !sens[i];
+                        }
+                        
+                    }
+                    SDL_RenderCopy(ecran, sprite, &SrcR_sprite, &e[i].DestR);
                 }
             }
         switch(evenements.type){
@@ -388,7 +422,7 @@ int main(int argc, char *argv[]){
             switch(evenements.key.keysym.sym){
                 case SDLK_RIGHT:
                     
-                    if(p.DestR.x<(*tailleY-1)*SrcR_pavage[0][0].h+3 && !estMort(p) && !(check_collision(p.DestR, DestR_pavage[pPosx][pPosy]) && !(terrain[pPosx][pPosy+1]=='0' || terrain[pPosx][pPosy+1]=='5' || terrain[pPosx][pPosy+1]=='6'))){
+                    if(p.DestR.x<(*tailleY-1)*SrcR_pavage[0][0].h+3 && !estMort(p) && !(check_collision(p.DestR, DestR_pavage[pPosx][pPosy]) && !(terrain[pPosx][pPosy+1]=='0' || terrain[pPosx][pPosy+1]=='5' || terrain[pPosx][pPosy+1]=='6' || terrain[pPosx][pPosy]=='1'))){
                         p.DestR.x += 1;
                         SDL_RenderCopy(ecran, sprite, &SrcR_sprite, &p.DestR);
                         for (int i = 0; i < nbObjet; i++)
@@ -401,7 +435,7 @@ int main(int argc, char *argv[]){
                     }
                     break;
                 case SDLK_LEFT:
-                    if (p.DestR.x>0 && !estMort(p) && !(check_collision(p.DestR, DestR_pavage[pPosx][pPosy]) && !(terrain[pPosx][pPosy]=='0' || terrain[pPosx][pPosy]=='5' || terrain[pPosx][pPosy]=='6')))
+                    if (p.DestR.x>0 && !estMort(p) && !(check_collision(p.DestR, DestR_pavage[pPosx][pPosy]) && !(terrain[pPosx][pPosy]=='0' || terrain[pPosx][pPosy]=='5' || terrain[pPosx][pPosy]=='6' || terrain[pPosx][pPosy]=='1')))
                     {
                         p.DestR.x -= 1;  
                         SDL_RenderCopy(ecran, sprite, &SrcR_sprite, &p.DestR); 
@@ -415,7 +449,7 @@ int main(int argc, char *argv[]){
                     }
                     break;
                 case SDLK_DOWN:
-                    if (p.DestR.y<(*tailleX-2)*SrcR_pavage[0][0].w+3 && !estMort(p) && (pPosx<(*tailleX-1) && !(check_collision(p.DestR, DestR_pavage[pPosx+1][pPosy]) && !(terrain[pPosx+1][pPosy]=='0' || terrain[pPosx+1][pPosy]=='5' || terrain[pPosx+1][pPosy]=='6')) && pPosx<(*tailleX-1)) )//|| (i<tailleX-1 && terrain[i+1][j]=='0'))
+                    if (p.DestR.y<(*tailleX-2)*SrcR_pavage[0][0].w+3 && !estMort(p) && (pPosx<(*tailleX-1) && !(check_collision(p.DestR, DestR_pavage[pPosx+1][pPosy]) && !(terrain[pPosx+1][pPosy]=='0' || terrain[pPosx+1][pPosy]=='5' || terrain[pPosx+1][pPosy]=='6' || terrain[pPosx][pPosy]=='1')) && pPosx<(*tailleX-1)) )//|| (i<tailleX-1 && terrain[i+1][j]=='0'))
                     {
                         p.DestR.y += 1;  
                         SDL_RenderCopy(ecran, sprite, &SrcR_sprite, &p.DestR);
@@ -429,7 +463,7 @@ int main(int argc, char *argv[]){
                     }
                     break;
                 case SDLK_UP:
-                    if (p.DestR.y>0 && !estMort(p) && !(check_collision(p.DestR, DestR_pavage[pPosx][pPosy]) && !(terrain[pPosx][pPosy]=='0' || terrain[pPosx][pPosy]=='5' || terrain[pPosx][pPosy]=='6')))
+                    if (p.DestR.y>0 && !estMort(p) && !(check_collision(p.DestR, DestR_pavage[pPosx][pPosy]) && !(terrain[pPosx][pPosy]=='0' || terrain[pPosx][pPosy]=='5' || terrain[pPosx][pPosy]=='6' || terrain[pPosx][pPosy]=='1')))
                     {
                         p.DestR.y -= 1;
                         SDL_RenderCopy(ecran, sprite, &SrcR_sprite, &p.DestR);
@@ -451,6 +485,10 @@ int main(int argc, char *argv[]){
                             attaquer(e[i],&p);
                         }
                     }
+                    break;
+                case SDLK_k:
+                    modifier_caractere(terrain, *tailleX, *tailleY, '2', '0');
+                    p.DestR = sortie;
                     break;
                 case SDLK_ESCAPE:
                     continuer = false;
@@ -538,6 +576,7 @@ int main(int argc, char *argv[]){
     SDL_DestroyTexture(t_sauv);
     SDL_DestroyTexture(t_charger);
     SDL_DestroyTexture(t_quitter);
+    SDL_DestroyTexture(t_fin);
     SDL_DestroyTexture(t_mort);
     SDL_DestroyTexture(t_GO_charg);
     SDL_DestroyTexture(t_GO_quit);
