@@ -164,12 +164,28 @@ int main(int argc, char *argv[]){
 
     //Menu Mort
     char msgMort[] = "Vous etes mort";
-    SDL_Texture* fin = charger_texte(msgMort,ecran,font,color);
-    SDL_Rect textFin;
-    textFin.x = width/4;
-    textFin.y = 2*(height/7);
-    textFin.w = width/2;
-    textFin.h = height/7;
+    SDL_Texture* t_mort = charger_texte(msgMort,ecran,font,color);
+    SDL_Rect t_mort_pos;
+    t_mort_pos.x = width/4;
+    t_mort_pos.y = 2*(height/7);
+    t_mort_pos.w = width/2;
+    t_mort_pos.h = height/5;
+
+    char msgGOCharg[] = "Charger";
+    SDL_Texture* t_GO_charg = charger_texte(msgGOCharg,ecran,font,color);
+    SDL_Rect t_GO_charg_pos;
+    t_GO_charg_pos.x = width/9;
+    t_GO_charg_pos.y = 5*(height/7);
+    t_GO_charg_pos.w = width/3;
+    t_GO_charg_pos.h = height/7;
+
+    char msgGOQuit[] = "Quitter";
+    SDL_Texture* t_GO_quit = charger_texte(msgGOQuit,ecran,font,color);
+    SDL_Rect t_GO_quit_pos;
+    t_GO_quit_pos.x = 2*(width/9)+width/3;
+    t_GO_quit_pos.y = 5*(height/7);
+    t_GO_quit_pos.w = width/3;
+    t_GO_quit_pos.h = height/7;
 
 
     Personnage p =cons(DestR_sprite, START_HEALTH, START_STRENGTH);
@@ -238,7 +254,12 @@ int main(int argc, char *argv[]){
                 {
                     continuer = true;
                 }
-                if (evenements.button.y<(text2.y+text2.h) && evenements.button.y>(text2.y))
+                if (evenements.button.y<(text1.y+text1.h) && evenements.button.y>(text1.y) && evenements.button.x<(text1.x+text1.w) && evenements.button.x>(text1.x))
+                {
+                    //A faire avec chargement/sauvegarde de la partie
+                    continuer = true;
+                }
+                if (evenements.button.y<(text2.y+text2.h) && evenements.button.y>(text2.y) && evenements.button.x<(text2.x+text2.w) && evenements.button.x>(text2.x))
                 {
                     continuer = true;
                     terminer = true;
@@ -286,17 +307,14 @@ int main(int argc, char *argv[]){
             }
             
         }
-        //if (!estMort(p))
-        //{
-            SDL_RenderCopy(ecran, sprite, &SrcR_sprite, &p.DestR);
-        //}
+        SDL_RenderCopy(ecran, sprite, &SrcR_sprite, &p.DestR);
         int pPosx=p.DestR.y/DestR_pavage[0][0].h;
         int pPosy=p.DestR.x/DestR_pavage[0][0].w;
         for (int i = 0; i < nbObjet; i++)
             {
                 if (!o[i].recupere)
                 {
-                    //SDL_RenderCopy(ecran, sprite, &SrcR_sprite, &o[i].DestR);
+                    SDL_RenderCopy(ecran, sprite, &SrcR_sprite, &o[i].DestR);
                 }
             }
         for (int i = 0; i < nbEnnemi; i++)
@@ -458,6 +476,16 @@ int main(int argc, char *argv[]){
                                 {
                                     continuer = true;
                                 }
+                                if (evenements.button.y<(t_sauv_pos.y+t_sauv_pos.h) && evenements.button.y>(t_sauv_pos.y) && evenements.button.x<(t_sauv_pos.x+t_sauv_pos.w) && evenements.button.x>(t_sauv_pos.x))
+                                {
+                                    //A changer quand sauvegarde et chargement seront implementé
+                                    continuer = true;
+                                }
+                                if (evenements.button.y<(t_charg_pos.y+t_charg_pos.h) && evenements.button.y>(t_charg_pos.y) && evenements.button.x<(t_charg_pos.x+t_charg_pos.w) && evenements.button.x>(t_charg_pos.x))
+                                {
+                                    //A changer quand sauvegarde et chargement seront implementé
+                                    continuer = true;
+                                }
                                 if (evenements.button.y<(t_quit_pos.y+t_quit_pos.h) && evenements.button.y>(t_quit_pos.y) && evenements.button.x<(t_quit_pos.x+t_quit_pos.w) && evenements.button.x>(t_quit_pos.x))
                                 {
                                     continuer = true;
@@ -478,9 +506,9 @@ int main(int argc, char *argv[]){
                 SDL_RenderClear(ecran);
                 SDL_RenderCopy(ecran, fond, NULL, NULL);
                 SDL_WaitEvent(&evenements);
-                SDL_RenderCopy(ecran,fin,NULL,&textFin);
-                SDL_RenderCopy(ecran,charger,NULL,&text1);
-                SDL_RenderCopy(ecran,quitter,NULL,&text2);
+                SDL_RenderCopy(ecran,t_mort,NULL,&t_mort_pos);
+                SDL_RenderCopy(ecran,t_GO_charg,NULL,&t_GO_charg_pos);
+                SDL_RenderCopy(ecran,t_GO_quit,NULL,&t_GO_quit_pos);
                 switch(evenements.type){
                     case SDL_QUIT:continuer = true;
                     break;
@@ -490,7 +518,7 @@ int main(int argc, char *argv[]){
                             break;
                         }
                     case SDL_MOUSEBUTTONUP: 
-                        if (evenements.button.y<(text2.y+text2.h) && evenements.button.y>(text2.y))
+                        if (evenements.button.y<(t_GO_quit_pos.y+t_GO_quit_pos.h) && evenements.button.y>(t_GO_quit_pos.y))
                         {
                             
                             terminer = true;
@@ -503,8 +531,6 @@ int main(int argc, char *argv[]){
         SDL_RenderPresent(ecran);
     }// Quitter SDL;
     TTF_Quit();
-    SDL_DestroyTexture(fin);
-    SDL_DestroyTexture(fond);
     SDL_DestroyTexture(jouer);
     SDL_DestroyTexture(charger);
     SDL_DestroyTexture(quitter);
@@ -512,6 +538,10 @@ int main(int argc, char *argv[]){
     SDL_DestroyTexture(t_sauv);
     SDL_DestroyTexture(t_charger);
     SDL_DestroyTexture(t_quitter);
+    SDL_DestroyTexture(t_mort);
+    SDL_DestroyTexture(t_GO_charg);
+    SDL_DestroyTexture(t_GO_quit);
+    SDL_DestroyTexture(fond);
     SDL_DestroyTexture(sprite);
     SDL_DestroyTexture(pavage);
     SDL_DestroyRenderer(ecran);//Quitter SDL ...
