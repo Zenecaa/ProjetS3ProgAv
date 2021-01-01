@@ -9,6 +9,7 @@
 #include "fonction_objet.h"
 #include "fonction_personnage.h"
 #include "fonction_sauvegarde.h"
+#include "fonction_chargement.h"
 #define SIZE_X 600
 #define SIZE_Y 600
 #define START_HEALTH 20
@@ -281,7 +282,62 @@ int main(int argc, char *argv[]){
                 }
                 if (evenements.button.y<(text1.y+text1.h) && evenements.button.y>(text1.y) && evenements.button.x<(text1.x+text1.w) && evenements.button.x>(text1.x))
                 {
-                    //A faire avec chargement/sauvegarde de la partie
+                    FILE *f = fopen("sauvegarde.txt", "r");
+                    //chargement des donnees du personnage
+                    fscanf(f, "%d", &p.DestR.x);
+                    fscanf(f, "%d", &p.DestR.y);
+                    fscanf(f, "%d", &p.DestR.w);
+                    fscanf(f, "%d", &p.DestR.h);
+                    fscanf(f, "%d", &p.vie);
+                    fscanf(f, "%d", &p.force);
+                    //chargement des objets
+                    for (int i = 0; i < nbObjet; i++)
+                    {
+                        fscanf(f, "%d", &o[i].DestR.x);
+                        fscanf(f, "%d", &o[i].DestR.y);
+                        fscanf(f, "%d", &o[i].DestR.w);
+                        fscanf(f, "%d", &o[i].DestR.h);
+                        int a = 0;
+                        fscanf(f, "%d", &a);
+                        if (a==1)
+                        {
+                            o[i].recupere=true;
+                        }
+                        else{
+                            o[i].recupere=false;
+                        }
+                        fscanf(f, "%d", &a);
+                        if (a==1)
+                        {
+                            o[i].soigne=true;
+                        }
+                        else
+                        {
+                            o[i].soigne=false;
+                        }
+                        fscanf(f, "%d", &o[i].soin);
+                        fscanf(f, "%d", &o[i].force);
+                    }
+                    for (int i = 0; i < nbEnnemi; i++)
+                    {
+                        fscanf(f, "%d", &e[i].DestR.x);
+                        fscanf(f, "%d", &e[i].DestR.y);
+                        fscanf(f, "%d", &e[i].DestR.w);
+                        fscanf(f, "%d", &e[i].DestR.h);
+                        fscanf(f, "%d", &e[i].vie);
+                        fscanf(f, "%d", &e[i].force);
+                        int a = 0;
+                        fscanf(f, "%d", &a);
+                        if (a==1)
+                        {
+                            sens[i]=true;
+                        }
+                        else
+                        {
+                            sens[i]=false;
+                        }
+                    }
+                    fclose(f);
                     continuer = true;
                 }
                 if (evenements.button.y<(text2.y+text2.h) && evenements.button.y>(text2.y) && evenements.button.x<(text2.x+text2.w) && evenements.button.x>(text2.x))
@@ -517,13 +573,67 @@ int main(int argc, char *argv[]){
                                 }
                                 if (evenements.button.y<(t_sauv_pos.y+t_sauv_pos.h) && evenements.button.y>(t_sauv_pos.y) && evenements.button.x<(t_sauv_pos.x+t_sauv_pos.w) && evenements.button.x>(t_sauv_pos.x))
                                 {
-                                    //A changer quand sauvegarde et chargement seront implementé
-                                    sauvegarder("sauvegarde.txt", p, o, nbObjet, e, sens, nbObjet);
+                                    sauvegarde("sauvegarde.txt", p, o, nbObjet, e, sens, nbObjet);
                                     continuer = true;
                                 }
                                 if (evenements.button.y<(t_charg_pos.y+t_charg_pos.h) && evenements.button.y>(t_charg_pos.y) && evenements.button.x<(t_charg_pos.x+t_charg_pos.w) && evenements.button.x>(t_charg_pos.x))
                                 {
-                                    //A changer quand sauvegarde et chargement seront implementé
+                                    FILE *f = fopen("sauvegarde.txt", "r");
+                                    //chargement des donnees du personnage
+                                    fscanf(f, "%d", &p.DestR.x);
+                                    fscanf(f, "%d", &p.DestR.y);
+                                    fscanf(f, "%d", &p.DestR.w);
+                                    fscanf(f, "%d", &p.DestR.h);
+                                    fscanf(f, "%d", &p.vie);
+                                    fscanf(f, "%d", &p.force);
+                                    //chargement des objets
+                                    for (int i = 0; i < nbObjet; i++)
+                                    {
+                                        fscanf(f, "%d", &o[i].DestR.x);
+                                        fscanf(f, "%d", &o[i].DestR.y);
+                                        fscanf(f, "%d", &o[i].DestR.w);
+                                        fscanf(f, "%d", &o[i].DestR.h);
+                                        int a = 0;
+                                        fscanf(f, "%d", &a);
+                                        if (a==1)
+                                        {
+                                            o[i].recupere=true;
+                                        }
+                                        else{
+                                            o[i].recupere=false;
+                                        }
+                                        fscanf(f, "%d", &a);
+                                        if (a==1)
+                                        {
+                                            o[i].soigne=true;
+                                        }
+                                        else
+                                        {
+                                            o[i].soigne=false;
+                                        }
+                                        fscanf(f, "%d", &o[i].soin);
+                                        fscanf(f, "%d", &o[i].force);
+                                    }
+                                    for (int i = 0; i < nbEnnemi; i++)
+                                    {
+                                        fscanf(f, "%d", &e[i].DestR.x);
+                                        fscanf(f, "%d", &e[i].DestR.y);
+                                        fscanf(f, "%d", &e[i].DestR.w);
+                                        fscanf(f, "%d", &e[i].DestR.h);
+                                        fscanf(f, "%d", &e[i].vie);
+                                        fscanf(f, "%d", &e[i].force);
+                                        int a = 0;
+                                        fscanf(f, "%d", &a);
+                                        if (a==1)
+                                        {
+                                            sens[i]=true;
+                                        }
+                                        else
+                                        {
+                                            sens[i]=false;
+                                        }
+                                    }
+                                    fclose(f);
                                     continuer = true;
                                 }
                                 if (evenements.button.y<(t_quit_pos.y+t_quit_pos.h) && evenements.button.y>(t_quit_pos.y) && evenements.button.x<(t_quit_pos.x+t_quit_pos.w) && evenements.button.x>(t_quit_pos.x))

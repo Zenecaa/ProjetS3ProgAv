@@ -5,7 +5,7 @@
 #include"fonction_personnage.h"
 #include"fonction_sauvegarde.h"
 
-void sauvegarder(char nomfichier[], Personnage p, Objet o[], int nbObjets, Personnage e[], bool sens[], int nbEnnemis){
+void sauvegarde(char nomfichier[], Personnage p, Objet o[], int nbObjets, Personnage e[], bool sens[], int nbEnnemis){
     FILE *f = fopen(nomfichier, "w+");
     //sauvegarde des donnees du personnage
     fprintf(f, "%d\n",(p.DestR.x));
@@ -21,8 +21,22 @@ void sauvegarder(char nomfichier[], Personnage p, Objet o[], int nbObjets, Perso
         fprintf(f, "%d\n",(o[i].DestR.y));
         fprintf(f, "%d\n",(o[i].DestR.w));
         fprintf(f, "%d\n",(o[i].DestR.h));
-        fprintf(f, "%d\n",(o[i].recupere));
-        fprintf(f, "%d\n",(o[i].soigne));
+        if ((o[i].recupere))
+        {
+            fprintf(f, "%d\n", 1);
+        }
+        else
+        {
+            fprintf(f, "%d\n", 0);
+        }
+        if ((o[i].soigne))
+        {
+            fprintf(f, "%d\n", 1);
+        }
+        else
+        {
+            fprintf(f, "%d\n", 0);
+        }
         fprintf(f, "%d\n",(o[i].soin));
         fprintf(f, "%d\n",(o[i].force));
     }
@@ -35,7 +49,14 @@ void sauvegarder(char nomfichier[], Personnage p, Objet o[], int nbObjets, Perso
         fprintf(f, "%d\n",(e[i].DestR.h));
         fprintf(f, "%d\n",(e[i].vie));
         fprintf(f, "%d\n",(e[i].force));
-        fprintf(f, "%d\n",(sens[i]));
+        if (sens[i])
+        {
+            fprintf(f, "%d\n", 1);
+        }
+        else
+        {
+            fprintf(f, "%d\n", 0);
+        }
     }
     
     fclose(f);
