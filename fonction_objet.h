@@ -1,3 +1,6 @@
+#ifndef fonction_objet
+#define fonction_objet
+
 #include<stdbool.h>
 #include <SDL2/SDL.h>
 #include"fonction_personnage.h"
@@ -13,3 +16,5 @@ typedef struct Objet{
   void appliqueEffet(Objet o, Personnage * p);
 
   bool recuperer(Objet o, Personnage * p);
+
+#endif

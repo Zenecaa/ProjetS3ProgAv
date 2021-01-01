@@ -8,6 +8,7 @@
 #include "fonctions_collision.h"
 #include "fonction_objet.h"
 #include "fonction_personnage.h"
+#include "fonction_sauvegarde.h"
 #define SIZE_X 600
 #define SIZE_Y 600
 #define START_HEALTH 20
@@ -517,6 +518,7 @@ int main(int argc, char *argv[]){
                                 if (evenements.button.y<(t_sauv_pos.y+t_sauv_pos.h) && evenements.button.y>(t_sauv_pos.y) && evenements.button.x<(t_sauv_pos.x+t_sauv_pos.w) && evenements.button.x>(t_sauv_pos.x))
                                 {
                                     //A changer quand sauvegarde et chargement seront implementé
+                                    sauvegarder("sauvegarde.txt", p, o, nbObjet, e, sens, nbObjet);
                                     continuer = true;
                                 }
                                 if (evenements.button.y<(t_charg_pos.y+t_charg_pos.h) && evenements.button.y>(t_charg_pos.y) && evenements.button.x<(t_charg_pos.x+t_charg_pos.w) && evenements.button.x>(t_charg_pos.x))
