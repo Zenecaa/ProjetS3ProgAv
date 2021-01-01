@@ -9,7 +9,6 @@
 #include "fonction_objet.h"
 #include "fonction_personnage.h"
 #include "fonction_sauvegarde.h"
-#include "fonction_chargement.h"
 #define SIZE_X 600
 #define SIZE_Y 600
 #define START_HEALTH 20
@@ -59,7 +58,7 @@ int main(int argc, char *argv[]){
         }
     }
 
-   
+   SDL_Texture* obj = charger_image_transparente("obj.bmp", ecran,r,g,b);
 
     
     SDL_Rect DestR_pavage[*tailleX][*tailleY];
@@ -436,7 +435,7 @@ int main(int argc, char *argv[]){
             {
                 if (!o[i].recupere)
                 {
-                    SDL_RenderCopy(ecran, sprite, &SrcR_sprite, &o[i].DestR);
+                    SDL_RenderCopy(ecran, obj, &SrcR_sprite, &o[i].DestR);
                 }
             }
         for (int i = 1; i < nbEnnemi; i++)
@@ -694,6 +693,7 @@ int main(int argc, char *argv[]){
     SDL_DestroyTexture(t_GO_quit);
     SDL_DestroyTexture(fond);
     SDL_DestroyTexture(sprite);
+    SDL_DestroyTexture(obj);
     SDL_DestroyTexture(pavage);
     SDL_DestroyRenderer(ecran);//Quitter SDL ...
     SDL_DestroyWindow(fenetre);
