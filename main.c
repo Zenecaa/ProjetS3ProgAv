@@ -11,7 +11,7 @@
 #include "fonction_sauvegarde.h"
 #define SIZE_X 600
 #define SIZE_Y 600
-#define START_HEALTH 20
+#define START_HEALTH 6
 #define START_STRENGTH 1
 
 int main(int argc, char *argv[]){
@@ -562,7 +562,7 @@ int main(int argc, char *argv[]){
                             break;
                             case SDL_KEYDOWN:
                                 switch(evenements.key.keysym.sym){
-                                    case SDLK_SPACE:continuer = true;
+                                    case SDLK_ESCAPE:continuer = true;
                                     break;
                                 }
                             case SDL_MOUSEBUTTONUP: 

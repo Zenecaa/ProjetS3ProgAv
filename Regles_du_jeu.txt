@@ -1,0 +1,9 @@
+Le but du jeu est d'eliminer tout les ennemis sur la carte afin de débloquer la case blanche de sortie.
+
+Pour vous déplacer utilisez les flèches directionnelles du clavier, pour attaquer appuiez sur la barre espace.
+
+Certains objets dans le labyrinthe sont des objets vous permettant de récupérer de la santé, ne sous estimez pas leur valeur... cela pourrait vous coûter cher.
+
+Le seul moyen de terminer le jeu est d'éliminer tout les ennemis (c'est cruel, je sais...) et d'atteindre la case de sortie vous permettant de quitter cet endroit maudit.
+
+Si vous ne parvenez pas à tuer tout les ennemis, ou que vous souhaitez reprendre plus tard, vous pouvez appuier sur la touche echap de votre clavier pour quitter la partie ou sauvegarder ou charger une sauvegarde antérieure.
