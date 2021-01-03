@@ -9,3 +9,10 @@ Commandes:
     Pour ouvrir ou fermer le menu de pause: touche échap
 
 Pour plus d'informations sur comment jouer lisez "Regles_du_jeu.txt"
+
+Quentin Guionnaud
+Quentin Bernet
+
+
+Lien git:
+    https://github.com/Zenecaa/ProjetS3ProgAv
