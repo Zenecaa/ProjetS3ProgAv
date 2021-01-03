@@ -1,5 +1,7 @@
 # ProjetS3ProgAv
 
+Pour lancer le jeu ouvrez un terminal allez à l'emplacement du jeu et entrez la commande ./main
+
 Commandes:
 
     Pour se déplacer: touches directionnelles du clavier (flèches)
